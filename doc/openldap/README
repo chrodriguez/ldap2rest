@@ -1,0 +1,54 @@
+Instructions to populate an ldap server used to test service using openldap
+Instructions are for Ubuntu 11.10 or newer
+
+1. Install openldap:
+  apt-get install slapd
+
+2. Create a file /etc/ldap/slapd.conf with following content
+  include         /etc/ldap/schema/core.schema
+  include         /etc/ldap/schema/cosine.schema
+  include         /etc/ldap/schema/nis.schema
+  include         /etc/ldap/schema/inetorgperson.schema
+  moduleload      back_bdb
+  pidfile         /var/run/slapd/slapd.pid
+  argsfile        /var/run/slapd/slapd.args
+  loglevel        256
+  database        bdb
+  suffix          "o=acme
+  rootdn          "cn=admin,o=acme"
+  rootpw          "pass"
+  directory       /var/lib/ldap
+  access to attrs=userPassword,shadowLastChange
+          by anonymous auth
+          by self write
+          by * none
+  access to dn.children="o=acme"
+          by anonymous none
+          by * read
+
+3. Edit /etc/default/slapd setting following variable
+  SLAPD_CONF=/etc/ldap/slapd.conf
+
+4. Stop slapd service
+  service slapd stop
+
+5. Add data to ldap:
+  Directory where resides this documentation file, exists a file named 
+  data.ldif to be inserted in an empty fresh installed ldap directory.
+  To ensure directory is empty, we will delete any data in current 
+  directory:
+    rm /var/lib/ldap/*
+    cat <<ENDOFILE > /var/lib/ldap/DB_CONFIG
+set_cachesize 0 2097152 0
+set_lk_max_objects 1500
+set_lk_max_locks 1500
+set_lk_max_lockers 1500
+ENDOFILE
+    slapadd -f /etc/ldap/slapd.conf -l data.ldif
+    chown -R openldap:openldap /var/lib/ldap
+
+6. Start service
+  service slapd start
+
+7. Test if everything is OK:
+  ldapsearch -h localhost -b o=acme -Dcn=admin,o=acme -wpass -x -LLL

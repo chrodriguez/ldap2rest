@@ -1,0 +1,34 @@
+defaults: &defaults
+  ldap:
+    host: localhost
+    base: o=acme
+    username: cn=admin,o=acme
+    password: pass
+    user:
+      filter: objectclass=inetorgperson
+      key: uid
+      attributes:
+        uid: username
+        sn: last_name
+        givenName: first_name
+        cn: display_name
+        departmentNumber: office
+        employeeNumber: document_number
+    group:
+      filter: (objectclass=groupofnames)
+      key: cn
+      members_attribute: members
+      attributes:
+        cn: name
+        member: members
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+  ldap:
+    port: 39
+
+production:
+  <<: *defaults

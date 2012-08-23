@@ -1,0 +1,45 @@
+dn: o=acme
+objectclass: organization
+o: acme
+
+dn: ou=users,o=acme
+objectclass: organizationalUnit
+ou: users
+
+dn: uid=user01,ou=users,o=acme
+objectClass: inetOrgPerson
+sn: Doe
+givenName: John
+cn: John Doe
+uid: user01
+departmentNumber: dep 01
+employeeNumber: 01
+
+dn: uid=user02,ou=users,o=acme
+objectClass: inetOrgPerson
+sn: Fox
+givenName: Michael
+cn: Michael Fox
+uid: user02
+departmentNumber: dep 02
+employeeNumber: 02
+
+dn: uid=user03,ou=users,o=acme
+objectClass: inetOrgPerson
+sn: Deep
+givenName: Johnny
+cn: Johnny Deep
+uid: user03
+departmentNumber: dep 02
+employeeNumber: 03
+
+dn: ou=groups,o=acme
+objectclass: organizationalUnit
+ou: groups
+
+dn: cn=group01,ou=groups,o=acme
+objectclass: groupOfNames
+cn: group_01
+member: uid=user01,ou=users,o=acme
+
+
