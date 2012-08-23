@@ -20,9 +20,14 @@ module Backend
 
   class Ldap
     attr_reader :ldap
+    attr_accessor :dn
     public
       def to_json(options=nil)
         to_hash.to_json(options)
+      end
+
+      def to_s
+        self.class
       end
 
       def self.filter(filter)
@@ -61,6 +66,10 @@ module Backend
         raise ArgumentError, "Specified dn: #{dn} does not match any entry"
       end
 
+      def self.get_class_settings
+        get_settings.send("#{self.to_s.split('::').last.downcase}") 
+      end
+
     protected 
       def self.get_instance
         Ldap.new 
@@ -70,14 +79,12 @@ module Backend
         Settings.ldap
       end
 
-      def self.get_class_settings
-        get_settings.send("#{self.to_s.split('::').last.downcase}") 
-      end
 
 
       def self.from_entry(entry)
         attributes = get_class_settings.attributes
         instance = self.new
+        instance.dn = entry.dn
         attributes.each do | entry_attr, user_field | 
             value=entry.send(entry_attr)
             instance.send(user_field+"=", value.size > 1? value : value.first) 
