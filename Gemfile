@@ -1,7 +1,11 @@
 # A sample Gemfile
 source "http://rubygems.org"
 
-# gem "rails"
+gem "rack"
 gem "grape"
+gem "garner"
+gem "activesupport", "<= 3.1.0"
 gem "net-ldap"
-gem "settingslogic"
+gem "activeldap", :require => 'active_ldap'
+#gem "settingslogic"
+gem "rails_config"

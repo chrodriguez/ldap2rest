@@ -6,3 +6,6 @@ task :console do
   sh "irb -rubygems -I lib -r grape  -r settingslogic -r net/ldap -r settings -r backend/backend-ldap -r backend/user -r backend/group"
 end
 
+task :new do
+  sh "irb -rubygems -I lib -r ldap"
+end
