@@ -12,18 +12,19 @@ module API
 
     helpers do
       def build_filter(model, value)
-        Settings.ldap.send(model).filter.gsub('%s', value) if value
+        value = '*' unless value
+        Settings.ldap.send(model).filter.gsub('%s', value) if Settings.ldap.send(model).filter
       end
     end
 
     resource :users do
       desc "Returns a list of users from LDAP. List might be truncated if LDAP server limits response size"
       get do     
-#        cache do
+        @users = cache do
           filter ||= build_filter(:user, params[:filter])
-          @users = Ldap2Rest::User.find(:all, :filter => filter)
-          present @users, :with => Ldap2Rest::API::User
-#        end
+          Ldap2Rest::User.find(:all, :filter => filter).collect { |x| x.to_os }
+        end
+        present @users, :with => Ldap2Rest::API::User 
       end
 
       desc "Returns a single user matching specified username"
@@ -31,31 +32,33 @@ module API
         params do
           requires :username, :type => String, :desc => "username to be fetched"
         end
-        #cache do
+        @user = cache do
           @user = Ldap2Rest::User.find(:first, params[:username])
-          present @user, :with => Ldap2Rest::API::User
-        #end
+          @user.to_os if @user
+        end
+        present @user, :with => Ldap2Rest::API::User
       end
 
       get ":username/groups" do
         params do
           requires :username, :type => String, :desc => "username to be fetched"
         end
-        #cache do
-          @user = Ldap2Rest::User.find(:first, params[:username])
-          present @user.groups, :with => Ldap2Rest::API::Group if @user
-        #end
+        @groups = cache do
+          Ldap2Rest::User.find(:first, params[:username]).groups.collect { |x| x.to_os }
+        end
+        present @groups, :with => Ldap2Rest::API::Group 
       end
     end
 
     resource :groups do
       desc "Returns a list of groups from LDAP. List might be truncated if LDAP server limits response size"
       get do     
-#        cache do
+        @groups = cache do
           filter ||= build_filter(:group, params[:filter])
-          @groups = Ldap2Rest::Group.find(:all, :filter => filter)
-          present @groups, :with => Ldap2Rest::API::Group
-#        end
+          puts filter
+          Ldap2Rest::Group.find(:all, :filter => filter).collect { |x| x.to_os }
+        end
+        present @groups, :with => Ldap2Rest::API::Group
       end
 
       desc "Returns a list of groups from LDAP matching specified filter"
@@ -63,10 +66,10 @@ module API
         params do
           requires :filter, :type => String, :desc => "filter by group name. Wildcard(*) should be used"
         end
-        #cache do
-          @group = Ldap2Rest::Group.find(:first, params[:name])
-          present @group.members, :with => Ldap2Rest::API::User
-        #end
+        @users = cache do
+          Ldap2Rest::Group.find(:first, params[:name]).members.collect { |x| x.to_os }
+        end
+        present @users , :with => Ldap2Rest::API::User 
       end
     end
 

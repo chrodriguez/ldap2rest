@@ -6,6 +6,7 @@ ldap:
     password: pass
   user:
     dn_attribute: uid
+    prefix: ou=Users
     classes: 
       - inetorgperson
     filter: (|(uid=%s)(sn=%s)(cn=%s)(givenName=%s))
