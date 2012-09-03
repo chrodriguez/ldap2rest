@@ -11,3 +11,5 @@ Garner::Cache::ObjectIdentity::KEY_STRATEGIES = [
   Garner::Strategies::Keys::RequestPath,
   Garner::Strategies::Keys::RequestGet 
 ]
+
+Garner.config.expires_in = 1800
