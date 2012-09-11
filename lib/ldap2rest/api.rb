@@ -8,7 +8,7 @@ module API
     format :json
     default_format :json
 
-    #rescue_from :all 
+    rescue_from :all 
 
     helpers do
       def build_filter(model, value)
@@ -55,7 +55,6 @@ module API
       get do     
         @groups = cache do
           filter ||= build_filter(:group, params[:filter])
-          puts filter
           Ldap2Rest::Group.find(:all, :filter => filter).collect { |x| x.to_os }
         end
         present @groups, :with => Ldap2Rest::API::Group

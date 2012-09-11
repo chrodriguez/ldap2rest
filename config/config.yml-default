@@ -1,4 +1,6 @@
 ldap:
+  cache:
+    ttl: 3600
   connection:
     host: localhost
     base: o=acme
