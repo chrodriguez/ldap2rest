@@ -17,7 +17,7 @@ module Ldap2Rest
     def self.validate_config
       h = Settings.to_hash
       h.assert_valid_keys(:ldap)
-      h[:ldap].assert_valid_keys(:connection,:cache, :user, :group)
+      h[:ldap].assert_valid_keys(:connection,:cache, :limit_results, :user, :group)
       c = h[:ldap][:connection]
       [ :host, :base ].each do |k|
         raise(ArgumentError, "Need ldap.connection.key: #{k}") unless h[:ldap][:connection].has_key?(k)
@@ -29,6 +29,6 @@ module Ldap2Rest
         raise(ArgumentError, "Need key: ldap.group.#{k}") unless h[:ldap][:group].has_key?(k)
       end
     end
-    
+
   end
 end

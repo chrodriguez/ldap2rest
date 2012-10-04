@@ -74,6 +74,7 @@ This simple RACK application is configured using an yml file. This file should b
 ldap:
   cache:
     ttl: 3600
+  limit_results: 100
   connection:
     host: localhost
     base: o=acme
@@ -111,6 +112,11 @@ directory.
 
 *  *ttl:* is a time in seconds to cache results in memory by server, without quering LDAP for same result just queried
 
+### Limit result sets
+
+*  *limit_results:* numbers of entries to return when searching users or groups. If removed, limit is not set and 
+all entries are returned or limited by server
+
 ### Connection
 
 * *host:* LDAP host server
@@ -146,3 +152,35 @@ attribute mappings from LDAP attribute name on the left, to a service name attri
 on the right. In the given example above, you can see that cn ldap attribute will
 be retrieved as name by rest service
 
+# Runing the service
+As a rack application you can use any server specified in http://rack.rubyforge.org/doc/
+Here are steps necesary to deploy the service using:
+* Apache + Modrails 
+* Java Application Server deploying as war package
+
+## Apache + Modrails
+Follow instructions to enable Phusion Passenger as is specified in http://www.modrails.com/
+Once module is runing, deploy the application in any directory you want (supose /opt/ldap2rest). A sample 
+virtual host for this application would be:
+
+```
+<Directory /opt/ldap2rest >
+        PassengerResolveSymLinksInDocumentRoot on
+        RackBaseUri /ldap2rest
+        AllowOverride All
+        Order allow,deny
+        allow from all
+        Options -Multiviews
+</Directory>
+```
+
+## Java Application Server
+To generate a war to deploy inside a Jboss application server install warble gem and then get into
+application directory and run:
+
+```bash
+warble
+```
+
+When it finishes, it will generate a war with its name as the container directory. Deploy it as any Java 
+package

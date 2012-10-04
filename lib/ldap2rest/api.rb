@@ -22,7 +22,7 @@ module API
       get do     
         @users = cache do
           filter ||= build_filter(:user, params[:filter])
-          Ldap2Rest::User.find(:all, :filter => filter).collect { |x| x.to_os }
+          Ldap2Rest::User.find(:all, { :filter => filter, :limit => Settings.ldap.limit_results }).collect { |x| x.to_os }
         end
         present @users, :with => Ldap2Rest::API::User 
       end
@@ -55,13 +55,13 @@ module API
       get do     
         @groups = cache do
           filter ||= build_filter(:group, params[:filter])
-          Ldap2Rest::Group.find(:all, :filter => filter).collect { |x| x.to_os }
+          Ldap2Rest::Group.find(:all,{ :filter => filter, :limit => Settings.ldap.limit_results }).collect { |x| x.to_os }
         end
         present @groups, :with => Ldap2Rest::API::Group
       end
 
       desc "Returns a list of groups from LDAP matching specified filter"
-      get ":name/members" do     
+      get ":name/members" do
         params do
           requires :filter, :type => String, :desc => "filter by group name. Wildcard(*) should be used"
         end

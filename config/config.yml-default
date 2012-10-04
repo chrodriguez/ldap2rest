@@ -1,6 +1,7 @@
 ldap:
   cache:
     ttl: 3600
+  limit_results: 100
   connection:
     host: localhost
     base: o=acme
