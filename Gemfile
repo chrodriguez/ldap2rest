@@ -8,4 +8,4 @@ gem "activesupport"
 gem "net-ldap"
 gem "activeldap", :require => 'active_ldap', :git => "https://github.com/activeldap/activeldap.git"
 gem "rails_config"
-gem "jruby-openssl"
+gem "jruby-openssl", platforms: :jruby

@@ -152,7 +152,76 @@ attribute mappings from LDAP attribute name on the left, to a service name attri
 on the right. In the given example above, you can see that cn ldap attribute will
 be retrieved as name by rest service
 
-# Runing the service
+# Requirements
+
+This application depends on a legacy gem stack (activeldap 3.2.1, activesupport 3.2.8,
+grape 0.2.1) that is **not compatible with Ruby 2.7+**. Newer Ruby versions fail at boot
+with `SyntaxError: circular argument reference` coming from activesupport 3.2.8.
+
+You must run it with **Ruby 2.0.0**. The required version is pinned in `.tool-versions`:
+
+```
+ruby 2.0.0-p648
+```
+
+If you use a version manager such as asdf or rbenv, it will pick up this file automatically.
+
+# Quick start with rackup
+
+The simplest way to run and test the service locally is with `rackup`:
+
+```bash
+# 1. Install dependencies (Ruby 2.0.0)
+bundle install
+
+# 2. Create your config from the template and edit it
+cp config/config.yml-default config/config.yml
+$EDITOR config/config.yml
+
+# 3. Start the service (listens on http://localhost:9292 by default)
+bundle exec rackup
+```
+
+Once running, every endpoint is prefixed with `/v1`. Try it with curl:
+
+```bash
+# List users (filter is optional, * is the wildcard)
+curl "http://localhost:9292/v1/users?filter=a*"
+
+# A single user
+curl "http://localhost:9292/v1/users/chrod"
+
+# Groups a user belongs to
+curl "http://localhost:9292/v1/users/chrod/groups"
+
+# List groups
+curl "http://localhost:9292/v1/groups?filter=vpn*"
+
+# Members of a group (filter is required here)
+curl "http://localhost:9292/v1/groups/GROUP_NAME/members?filter=*"
+```
+
+## Connecting over SSL (LDAPS)
+
+To talk to the LDAP server over SSL, set `port: 636` and `method: :ssl` inside the
+`connection` section. The bundled `net-ldap 0.3.1` does **not** support a `tls_options`
+key, and it does not verify the server certificate.
+
+```yml
+ldap:
+  connection:
+    host: ldap.example.com
+    base: dc=example,dc=com
+    bind_dn: uid=readonlyuser,ou=Special Users,dc=example,dc=com
+    password: secret
+    port: 636
+    method: :ssl
+```
+
+For an unencrypted connection just omit `port` and `method` (defaults to plain LDAP on
+port 389).
+
+# Deploying the service
 As a rack application you can use any server specified in http://rack.rubyforge.org/doc/
 Here are steps necesary to deploy the service using:
 * Apache + Modrails 
